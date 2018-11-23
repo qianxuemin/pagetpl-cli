@@ -1,0 +1,32 @@
+{
+  "name": "pagetpl-cli",
+  "version": "1.0.1",
+  "description": "一个快速创建后台管理系统页面的小工具",
+  "bin": {
+    "pagetpl": "bin/pagetpl",
+    "pagetpl-add": "bin/pagetpl-add",
+    "pagetpl-list": "bin/pagetpl-list"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "pagetpl-cli",
+    "cli",
+    "scaffold",
+    "FE"
+  ],
+  "author": "qianxuemin",
+  "license": "ISC",
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "dependencies": {
+    "chalk": "^2.4.1",
+    "commander": "^2.19.0",
+    "ejs": "^2.6.1",
+    "inquirer": "^6.2.0",
+    "request": "^2.88.0",
+    "semver": "^5.6.0"
+  }
+}

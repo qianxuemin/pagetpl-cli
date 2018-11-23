@@ -1,0 +1,33 @@
+#!/usr/bin/env node
+
+// 页面模板列表
+const chalk = require('chalk')
+const logger = require('../lib/logger')
+
+/**
+ * Padding.
+ */
+
+logger.tips()
+process.on('exit', () => {
+  logger.tips()
+})
+
+/**
+ * List repos.
+ */
+
+const templateList=[
+{name:'dva-page',description:'dva版本的页面模板'},
+{name:'redux-page',description:'redux版本的页面模板'}
+]
+
+logger.tips('  可用的页面模板列表:')
+logger.tips()
+
+templateList.forEach(repo => {
+      logger.tips(
+        '  ' + chalk.yellow('  🏃') +
+        '  ' + chalk.blue(repo.name) +
+        ' - ' + repo.description)
+    })

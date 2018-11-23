@@ -1,0 +1,145 @@
+#!/usr/bin/env node
+
+const program = require('commander'); 
+const inquirer = require('inquirer'); 
+const chalk = require('chalk');
+const fs = require('fs');
+const join = require('path').join;
+const mkdirpSync = require('fs-extra').mkdirpSync;
+
+const checkVersion = require('../lib/check-version');
+const logger = require('../lib/logger');
+let generate = require('../lib/generate');
+const config = require('../lib/config')
+
+/**
+ * Usage.
+ */
+
+program
+    .usage('<template-name>')
+
+/**
+ * Help.
+ */
+
+program.on('--help', () => {
+    logger.tips('  Examples:')
+    logger.tips()
+    logger.tips(chalk.gray('    # create a new dva-page to your management system'))
+    logger.tips('    $ pagetpl add dva-page')
+    logger.tips()
+    logger.tips(chalk.gray('    # create a new redux-page to your management system'))
+    logger.tips('    $ pagetpl add redux-page')
+    logger.tips()
+})
+
+function help() {
+    // 若没有输入模板 返回帮助信息 
+    program.parse(process.argv);
+    if (program.args.length < 1) {
+        return program.help();
+    }
+}
+
+help();
+/**
+ * Padding.
+ */
+
+logger.tips()
+process.on('exit', () => {
+  logger.tips()
+})
+
+
+let templateName = program.args[0];
+
+if (templateName === "dva-page") {
+    const currentPath =  process.cwd()
+    logger.tips(chalk.blue(`   🏡  当前目录: 【 ${currentPath} 】`))
+    logger.tips()
+} else if (templateName === "redux-page") {
+    logger.tips(chalk.blue('    😢  你可以先试试dva版本 redux版本的页面模板还在定义中~  ☕️  ☕️  ☕️  '))
+    return
+} else {
+    return program.help();
+}
+
+
+  inquirer.prompt([{
+    type: 'confirm',
+    message:'确定上面 👆  的目录是项目根目录? 将在该目录下生成页面~',
+    name:'ok'
+  }]).then(answers => {
+    if (answers.ok) {
+      startAdd()
+    }
+  }).catch((err)=>{
+    logger.error(`pagetpl-cli error: ${err.message.trim()}`)
+  })
+
+  // 收集页面信息
+  function startAdd(){
+        const questions = [{
+        type: 'input',
+        message: '请输入页面文件夹的名字:',
+        name: 'folderName',
+        validate: function(val) {
+            if (/^[A-Za-z]{3,20}$/.test(val)) { // 是否是字符串
+                return true;
+            } else {
+                return "请输入3-20位的英文";
+            }
+        }
+    }, {
+        type: 'input',
+        message: '请输入新增页面的名字:',
+        name: 'pageName',
+        validate: function(val) {
+            if (/^[A-Za-z]{3,20}$/.test(val)) { // 是否是字符串
+                return true;
+            } else {
+                return "请输入3-20位的英文";
+            }
+        }
+    }, {
+        type: 'input',
+        message: '请输入新增页面的中文名字:',
+        name: 'chineseName',
+        validate: function(val) {
+            if (/^[\u4E00-\u9FA5]{2,20}$/.test(val)) { // 是否是中文
+                return true;
+            } else {
+                return "请输入3-20位的中文";
+            }
+        }
+    }
+    ,{
+        type: "confirm",
+        message: "是否自动配置models和services？",
+        name: "addModel"
+    }]
+
+
+    inquirer.prompt(questions).then((answers) => {
+        if (answers) {
+            runtask(answers)
+        }
+    })
+  }
+
+
+/**
+ *  版本检测 页面生成.
+ */
+function runtask(answers) {
+    // 检测是否有新的cli版本
+    checkVersion(() => {
+      // 生成文件
+        generate(answers.folderName,answers.pageName,answers.chineseName,answers.addModel)
+      
+    })
+}
+
+
