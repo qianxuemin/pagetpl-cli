@@ -73,45 +73,60 @@ if (templateName === "dva-page") {
     name:'ok'
   }]).then(answers => {
     if (answers.ok) {
-      startAdd()
+        // 当前 src/routes/ 下的文件夹个数
+        const routesPath = join(process.cwd(), config.pageRoot)
+        let defaultPage = `Page1`
+        let defaultChineseName = `新的页面1`;
+        if (fs.existsSync(routesPath)){
+            const oldPagelist = fs.readdirSync(routesPath)
+            const oldPagelistLenth = oldPagelist.length + 1
+            
+            defaultPage = `Page${oldPagelistLenth}`
+            defaultChineseName = `新的页面${oldPagelistLenth}`;
+        }
+        
+      startAdd(defaultPage,defaultChineseName)
     }
   }).catch((err)=>{
     logger.error(`pagetpl-cli error: ${err.message.trim()}`)
   })
 
   // 收集页面信息
-  function startAdd(){
+  function startAdd(defaultPage,defaultChineseName){
         const questions = [{
         type: 'input',
         message: '请输入页面文件夹的名字:',
         name: 'folderName',
+        default: defaultPage, // 默认值
         validate: function(val) {
-            if (/^[A-Za-z]{3,20}$/.test(val)) { // 是否是字符串
+            if (/^[A-Za-z0-9]{3,20}$/.test(val)) { // 是否是字符串
                 return true;
             } else {
-                return "请输入3-20位的英文";
+                return "请输入3-20位的英文或数字";
             }
         }
     }, {
         type: 'input',
         message: '请输入新增页面的名字:',
         name: 'pageName',
+        default: defaultPage, // 默认值
         validate: function(val) {
-            if (/^[A-Za-z]{3,20}$/.test(val)) { // 是否是字符串
+            if (/^[A-Za-z0-9]{3,20}$/.test(val)) { // 是否是字符串
                 return true;
             } else {
-                return "请输入3-20位的英文";
+                return "请输入3-20位的英文或数字";
             }
         }
     }, {
         type: 'input',
         message: '请输入新增页面的中文名字:',
         name: 'chineseName',
+        default: defaultChineseName, // 默认值
         validate: function(val) {
-            if (/^[\u4E00-\u9FA5]{2,20}$/.test(val)) { // 是否是中文
+            if (/^[\u4E00-\u9FA50-9]{2,20}$/.test(val)) { // 是否是中文
                 return true;
             } else {
-                return "请输入3-20位的中文";
+                return "请输入3-20位的中文或数字";
             }
         }
     }

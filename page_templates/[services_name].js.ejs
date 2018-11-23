@@ -1,9 +1,24 @@
-import request from '../utils/request'
+/**
+ *@desc 文件描述 <%- chineseName %>的services
+ *@author <%- author %>
+ *@date <%- time %>
+ */
 
-export async function query() {
-    return request('/api/users')
+import request from '../../utils/request'
+import BASE_URL from '../../config'
+
+// 获取权益定金下拉配置
+export async function getSearchConfig (params) {
+  return request(BASE_URL + '/api/<%- pageName %>/<%- pageName %>/config', {
+    method: 'POST',
+    body: params
+  })
 }
 
-export async function queryCurrent() {
-    return request('/api/currentUser')
+// 获取权益定金订单列表
+export async function getTableList (params) {
+  return request(BASE_URL + '/api/<%- pageName %>/<%- pageName %>/list', {
+    method: 'POST',
+    body: params
+  })
 }

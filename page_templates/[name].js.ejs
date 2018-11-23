@@ -1,11 +1,293 @@
-const a= "我是模板";
-import a<%- pageName %> from b<%- pageName %>
-const fs = require('fs');
-const path = require('path');
-const <%- pageName %> = require('<%- pageName %>')
+/**
+ *@desc 文件描述 <%- chineseName %>的services
+ *@author <%- author %>
+ *@date <%- time %>
+ */
 
-// 输出文件配置项 
-const config = {
-    outputPath: '',
-    outputName: ''
+import React, { PureComponent, Fragment } from 'react'
+import { connect } from 'dva'
+import moment from 'moment'
+import {
+    Row,
+    Col,
+    Card,
+    Form,
+    Input,
+    Select,
+    Button,
+    Table,
+    DatePicker
+} from 'antd'
+import styles from './<%- pageName %>.module.less'
+
+const FormItem = Form.Item
+const {RangePicker} = DatePicker
+const {Option} = Select
+const getTimeByMoment = (momentDate, toFormat = 'YYYY-MM-DD HH:00:00') => {
+    const timeStr = momentDate && moment(momentDate).format(toFormat) || null
+    return timeStr
+}
+@connect(({<%- pageName %>, loading}) => ({
+    <%- pageName %>,
+    loading: loading.models.<%- pageName %>
+}))
+@Form.create()
+export default class <%- pageName %> extends PureComponent {
+    state = {
+        formValues: {
+            orderCode: '',
+            orderStatus: 0,
+            commitDateFrom: '',
+            commitDateTo: ''
+        },
+        pagination: {
+            position: 'bottom',
+            pageSizeOptions: ['10', '20', '50'],
+            showTotal: (total, range) => `共${total}条`,
+            hideOnSinglePage: false,
+            showSizeChanger: true,
+            showQuickJumper: true
+        },
+        currentPage: 1,
+        pageSize: 10
+    }
+
+    componentDidMount () {
+        const {dispatch} = this.props
+        const {pageSize, currentPage} = this.state
+        // 获取下拉配置
+        dispatch({
+            type: '<%- pageName %>/fetchSearchConfig'
+            // payload: {}
+        })
+        // 获取列表
+        dispatch({
+            type: '<%- pageName %>/fetchTableList',
+            payload: {
+                page: currentPage,
+                page_size: pageSize
+            }
+        })
+    }
+
+    handleTableChange = (pagination) => {
+        const {dispatch} = this.props
+        const {formValues, currentPage, pageSize} = this.state
+        if (currentPage !== pagination.current || pageSize !== pagination.pageSize) {
+            // 点击分页
+            this.setState({
+                currentPage: pagination.current,
+                pageSize: pagination.pageSize
+            })
+        }
+        const params = {
+            ...formValues,
+            page: pagination.current,
+            page_size: pagination.pageSize
+        }
+
+        dispatch({
+            type: '<%- pageName %>/fetchTableList',
+            payload: params
+        })
+    }
+    /**
+     * @method handleFormReset 重置查询条件
+     */
+    handleFormReset = () => {
+        const {form, dispatch} = this.props
+        const {pageSize} = this.state
+        form.resetFields()
+        const value = {
+            orderCode: '',
+            orderStatus: 0,
+            commitDateFrom: '',
+            commitDateTo: ''
+        }
+
+        this.setState({
+            formValues: value,
+            currentPage: 1
+        })
+
+        const params = {
+            ...value,
+            page: 1,
+            page_size: pageSize
+        }
+
+        dispatch({
+            type: '<%- pageName %>/fetchTableList',
+            payload: params
+        })
+    }
+
+    /**
+     * @method handleSearchList 根据查询条件获取列表
+     */
+    handleSearchList = e => {
+        e.preventDefault()
+        const {dispatch, form} = this.props
+        const {pageSize} = this.state
+
+        form.validateFields((err, fieldsValue) => {
+            if (err) return
+            const value = {
+                orderCode: fieldsValue['orderCode'] || '',
+                orderStatus: fieldsValue['orderStatus'] && parseInt(fieldsValue['orderStatus']) || 0,
+                commitDateFrom: fieldsValue['commit_date'] && getTimeByMoment(fieldsValue['commit_date'][0]) || '',
+                commitDateTo: fieldsValue['commit_date'] && getTimeByMoment(fieldsValue['commit_date'][1]) || ''
+            }
+
+            this.setState({
+                formValues: value,
+                currentPage: 1
+            })
+
+            const params = {
+                ...value,
+                page: 1,
+                page_size: pageSize
+            }
+
+            dispatch({
+                type: '<%- pageName %>/fetchTableList',
+                payload: params
+            })
+        })
+    }
+    /**
+     * @method selectOption 渲染下拉列表
+     * @param { Array } optionList 下拉列表json
+     * @return { Array } 返回下拉项
+     * @example
+     * ```javascript
+     * 用法示例
+     * ```
+     */
+    selectOption = (optionList) => {
+        return optionList && optionList.map((item) => {
+            return (
+                <Option key={item.id} value={item.id}>{item.name}</Option>
+            )
+        })
+    }
+
+    renderFilterForm () {
+        const {getFieldDecorator} = this.props.form
+        const {<%- pageName %>: {searchConfig: {searchConfigList}}} = this.props
+
+        return (
+            <Form onSubmit={this.handleSearchList} layout="inline">
+                <Row gutter={{md: 8, lg: 24, xl: 48}}>
+                    <Col md={8} sm={24}>
+                        <FormItem label="就餐时间" colon={false}>
+                            {getFieldDecorator('commit_date')(<RangePicker
+                                showTime={{format: 'HH'}}
+                                format="YYYY-MM-DD HH:00:00"
+                                style={{width: '100%'}}/>)}
+                        </FormItem>
+                    </Col>
+                    <Col md={8} sm={24}>
+                        <FormItem label="就餐状态" colon={false}>
+                            {getFieldDecorator('orderStatus')(
+                                <Select style={{width: '100%'}}
+                                        allowClear={true} placeholder="请选择就餐状态">
+                                    {this.selectOption(searchConfigList)}
+                                </Select>
+                            )}
+                        </FormItem>
+                    </Col>
+                    <Col md={8} sm={24}>
+                        <FormItem label="菜系编号" colon={false}>
+                            {getFieldDecorator('orderCode')(<Input
+                                placeholder="请输入菜系编号"/>)}
+                        </FormItem>
+                    </Col>
+                </Row>
+                <Row gutter={{md: 8, lg: 24, xl: 48}}>
+                    <span style={{float: 'right', marginBottom: 24}}>
+                          <Button type="primary" htmlType="submit">
+                            查询
+                          </Button>
+                          <Button style={{marginLeft: 8}}
+                                  onClick={this.handleFormReset}>
+                            重置
+                          </Button>
+                    </span>
+                </Row>
+            </Form>
+        )
+    }
+
+    render () {
+        const {<%- pageName %>, loading} = this.props
+        const {pagination, currentPage, pageSize} = this.state
+        const {tableList, totalNum} = <%- pageName %>
+        const tableDataSource = tableList && tableList.data &&
+            tableList.data.list
+
+        const columns = [
+            {
+                title: '菜系编号',
+                dataIndex: 'order_code',
+                render: val => val || '--'
+            },
+            {
+                title: '味道评分',
+                dataIndex: 'taste_level',
+                render: val => val || '--'
+            },
+            {
+                title: '菜量大小',
+                dataIndex: 'quantity_level',
+                render: val => val || '--'
+            },
+            {
+                title: '就餐编码',
+                dataIndex: 'customer_code',
+                render: val => val || '--'
+                // render: val => val.replace(/^(\d{4})\d{4}(\d+)/, "$1****$2"),
+            },
+            {
+                title: '就餐状态',
+                dataIndex: 'order_status_text',
+                render: val => val || '--'
+            },
+            {
+                title: '就餐时间',
+                dataIndex: 'commit_time',
+                render: val => val || '--'
+            }
+
+        ]
+
+        return (
+            <Fragment>
+                <Card bordered={false}>
+                    <div
+                        className={styles.tableListForm}>
+                        {this.renderFilterForm()}
+                    </div>
+                </Card>
+
+                <Card bordered={false} style={{marginTop: 30}}>
+                    <Table
+                        rowKey="order_code"
+                        loading={loading}
+                        dataSource={tableDataSource}
+                        columns={columns}
+                        pagination={{
+                            ...pagination,
+                            total: totalNum,
+                            current: currentPage,
+                            pageSize: pageSize
+                        }}
+                        onChange={this.handleTableChange}
+                    />
+                </Card>
+            </Fragment>
+
+        )
+    }
 }
