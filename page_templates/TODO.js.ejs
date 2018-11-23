@@ -1,0 +1,44 @@
+/**
+ *@desc 文件描述 <%- chineseName %>的主页面
+ *@author <%- author %>
+ *@date <%- time %>
+ */
+
+// 启动整个应用还需要改动以下js文件
+
+
+// mock/api/user/menu.js
+
+{
+    'name': '<%- chineseName %>',
+    'icon': 'hdd',
+    'path': '<%- FolderName.toLowerCase() %>',
+    'children': [{
+        'name': '<%- chineseName %>',
+        'path': '<%- pageName %>'
+    }]
+}
+
+
+// src/common/menu.js
+
+{
+    name: '<%- chineseName %>',
+    icon: 'hdd',
+    path: '<%- FolderName.toLowerCase() %>',
+    children: [{
+        name: '<%- chineseName %>',
+        path: '<%- pageName %>'
+    }]
+}
+
+// src/common/router.js
+
+'/<%- FolderName.toLowerCase() %>': {
+    component: dynamicWrapper(app, ['<%- FolderName %>/<%- pageName %>'], () =>
+        import ('../routes/<%- FolderName %>/List'))
+},
+'/<%- FolderName.toLowerCase() %>/<%- pageName %>': {
+    component: dynamicWrapper(app, ['<%- FolderName %>/<%- pageName %>'], () =>
+        import ('../routes/<%- FolderName %>/<%- pageName %>'))
+}
