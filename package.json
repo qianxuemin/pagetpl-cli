@@ -1,6 +1,6 @@
 {
   "name": "pagetpl-cli",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "一个快速创建后台管理系统页面的小工具",
   "bin": {
     "pagetpl": "bin/pagetpl",
@@ -25,6 +25,7 @@
     "chalk": "^2.4.1",
     "commander": "^2.19.0",
     "ejs": "^2.6.1",
+    "fs-extra": "^7.0.1",
     "inquirer": "^6.2.0",
     "request": "^2.88.0",
     "semver": "^5.6.0"

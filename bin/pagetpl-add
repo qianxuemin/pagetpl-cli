@@ -60,7 +60,7 @@ if (templateName === "dva-page") {
     logger.tips(chalk.blue(`   🏡  当前目录: 【 ${currentPath} 】`))
     logger.tips()
 } else if (templateName === "redux-page") {
-    logger.tips(chalk.blue('    😢  你可以先试试dva版本 redux版本的页面模板还在定义中~  ☕️  ☕️  ☕️  '))
+    logger.tips(chalk.blue('    😢  你可以先试试dva版本的模板 redux版本的页面模板还在定义中~  ☕️  ☕️  ☕️  '))
     return
 } else {
     return program.help();
