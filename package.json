@@ -1,6 +1,6 @@
 {
   "name": "pagetpl-cli",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "一个快速创建后台管理系统页面的小工具",
   "bin": {
     "pagetpl": "bin/pagetpl",
