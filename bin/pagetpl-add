@@ -130,11 +130,11 @@ if (templateName === "dva-page") {
             }
         }
     }
-    ,{
+    /*,{
         type: "confirm",
         message: "是否自动配置models和services？",
         name: "addModel"
-    }]
+    }*/]
 
 
     inquirer.prompt(questions).then((answers) => {
@@ -152,7 +152,7 @@ function runtask(answers) {
     // 检测是否有新的cli版本
     checkVersion(() => {
       // 生成文件
-        generate(answers.folderName,answers.pageName,answers.chineseName,answers.addModel)
+        generate(answers.folderName,answers.pageName,answers.chineseName,true)
       
     })
 }
